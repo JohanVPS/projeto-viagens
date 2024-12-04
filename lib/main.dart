@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:viagens/firebase_options.dart';
-import 'screens/loginScreen.dart';
+import 'package:viagens/screens/verificaLoginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: LoginPage()
+        body: Verificaloginscreen()
       ),
     );
   }

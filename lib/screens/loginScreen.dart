@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:viagens/classes/users.dart';
 import 'package:viagens/screens/SignupScreen.dart';
+import 'package:viagens/screens/homeScreen.dart';
 import '../widgets/cores.dart';
 import '../widgets/inputDec.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   bool isPasswordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -19,31 +20,46 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   Future<String> fetchUid(String email) async {
-    var cliente = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
+    print(email);
 
-    if (cliente.docs.isNotEmpty) {
-      String uid = cliente.docs.first.id; // Acessa o ID do primeiro documento
-      return uid;
-    } else {
-      throw Exception('Usuário não encontrado');
+    try {
+      var cliente = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (cliente.docs.isNotEmpty) {
+        String uid = cliente.docs.first.id; // Acessa o ID do primeiro documento
+        print(uid);
+        return uid;
+      } else {
+        throw Exception('Usuário não encontrado');
+      }
+    } catch (e) {
+      throw Exception('usuario n encontrado $e');
     }
   }
 
   Future<Users> _getUsers(String email) async {
-    var users = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
-
-    var user = users.docs.first;
-
-    return Users(
-      name: user['name'],
-      email: user['email'],
-    );
+    print(email + ' getusers');
+    try {
+      var users = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+      if (users.docs.isEmpty) {
+        throw Exception('EMAIL NÃO ENCONTRADO');
+      }
+      var user = users.docs.first;
+      print(user);
+      return Users(
+        name: user['name'],
+        email: user['email'],
+      );
+    } catch (e) {
+      print(e);
+      throw Exception('deu ruim: $e');
+    }
   }
 
   void verifyLogin() async {
@@ -59,12 +75,12 @@ class _LoginPageState extends State<LoginPage> {
 
         print(users);
 
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MainMenuScreen(), // Passando toggleTheme se não for nulo
-        //   ),
-        // );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
       } on FirebaseAuthException catch (e) {
         print(e);
         showDialog(
@@ -144,31 +160,39 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
+                Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        // Campo de e-mail
+                        TextField(
+                          style: TextStyle(color: corBranca()),
+                          decoration: inputDec("E-mail", Icons.email),
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _emailController,
+                        ),
 
-                // Campo de e-mail
-                TextField(
-                  style: TextStyle(color: corBranca()),
-                  decoration: inputDec("E-mail", Icons.email),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 20),
+                        SizedBox(height: 20),
 
-                // Campo de senha
-                TextField(
-                  style: TextStyle(color: corBranca()),
-                  obscureText: !isPasswordVisible,
-                  decoration: inputDec(
-                    "Senha",
-                    Icons.lock,
-                    isPassword: true,
-                    isPasswordVisible: isPasswordVisible,
-                    toggleVisibility: () {
-                      setState(() {
-                        isPasswordVisible = !isPasswordVisible;
-                      });
-                    },
-                  ),
-                ),
+                        // Campo de senha
+                        TextField(
+                          style: TextStyle(color: corBranca()),
+                          controller: _passwordController,
+                          obscureText: !isPasswordVisible,
+                          decoration: inputDec(
+                            "Senha",
+                            Icons.lock,
+                            isPassword: true,
+                            isPasswordVisible: isPasswordVisible,
+                            toggleVisibility: () {
+                              setState(() {
+                                isPasswordVisible = !isPasswordVisible;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    )),
                 SizedBox(height: 20),
 
                 // Botão de login
@@ -182,18 +206,19 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: _isLoading ? Center(
-                      child: CircularProgressIndicator(
-                        color: corDestaque(),
-                      )
-                    ) : Text(
-                      "Entrar",
-                      style: TextStyle(
-                        color: corBranca(),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                            color: corBranca(),
+                          ))
+                        : Text(
+                            "Entrar",
+                            style: TextStyle(
+                              color: corBranca(),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                     onPressed: () {
                       verifyLogin();
                     },
