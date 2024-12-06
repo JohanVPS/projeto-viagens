@@ -101,7 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: corFundo(),
+      backgroundColor: corPrimaria(),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(

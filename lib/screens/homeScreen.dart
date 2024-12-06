@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:viagens/screens/loginScreen.dart';
+import 'package:viagens/widgets/cores.dart';
 
 void main() {
   runApp(HomeScreen());
@@ -12,8 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isDarkMode = false; 
-
+  bool isDarkMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,77 +44,39 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light, 
-      home: TelaPlanosDeViagem(
-        // toggleTheme: toggleTheme,
-        isDarkMode: isDarkMode,
-      ),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: TelaPlanosDeViagem(),
     );
   }
 }
 
 class TelaPlanosDeViagem extends StatefulWidget {
-  final Function? toggleTheme; 
-  final bool isDarkMode; 
-  TelaPlanosDeViagem({this.toggleTheme, required this.isDarkMode});
-
   @override
   _TelaPlanosDeViagemState createState() => _TelaPlanosDeViagemState();
 }
 
 class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> logout(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.signOut();
-      Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LoginScreen(),
-      ),
-    );
-
+      await _auth.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
     } catch (e) {
       print('Erro ao fazer logout: $e');
     }
   }
 
-  final List<PlanoDeViagem> planos = [
-    PlanoDeViagem(
-      titulo: "Paris",
-      data: "12-20 Dez",
-      descricao: "Torre Eiffel e Louvre.",
-      veiculo: "Avião",
-    ),
-    PlanoDeViagem(
-      titulo: "Maldivas",
-      data: "05-10 Jan",
-      descricao: "Resorts de luxo.",
-      veiculo: "Barco",
-    ),
-    PlanoDeViagem(
-      titulo: "Montanhas",
-      data: "15-22 Fev",
-      descricao: "Caminhadas e trilhas.",
-      veiculo: "Carro",
-    ),
-  ];
-
-  void adicionarPlano(String titulo, String data, String descricao, String veiculo) {
-    setState(() {
-      planos.add(PlanoDeViagem(
-        titulo: titulo,
-        data: data,
-        descricao: descricao,
-        veiculo: veiculo,
-      ));
-    });
-  }
-
   void abrirFormularioCadastro() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => FormularioPlano(adicionarPlano: adicionarPlano),
+      builder: (context) => FormularioPlano(
+        usuarioId: _auth.currentUser?.uid,
+      ),
     );
   }
 
@@ -121,19 +84,18 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 39, 52, 63),
+        backgroundColor: corPrimaria(),
         elevation: 0,
-        // leading: IconButton(
-        //   icon: Icon(Icons.menu, color: Colors.white),
-        //   onPressed: () {},
-        // ),
+        iconTheme: IconThemeData(
+          color: corBranca(), // Define a cor do ícone do Drawer
+        ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.logout_rounded,
               color: Colors.white,
             ),
-            onPressed: () {logout(context);}, 
+            onPressed: () => logout(context),
           ),
         ],
         title: Text(
@@ -148,11 +110,11 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
       ),
       drawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
+          padding: EdgeInsets.zero, // Remove padding padrão do Drawer
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: corPrimaria(),
               ),
               child: Text(
                 'Menu',
@@ -164,70 +126,63 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
             ),
             ListTile(
               leading: Icon(Icons.home),
-              title: Text('Início'),
+              title: Text('Página Inicial'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
-                // Navegar para outra página ou realizar alguma ação
+                // Fechar o Drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle_rounded),
+              title: Text('Conta'),
+              onTap: () {
+                // Fechar o Drawer
+                Navigator.pop(context);
               },
             ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Configurações'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
-                // Navegar para outra página ou realizar alguma ação
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.account_box),
-              title: Text('Sair'),
-              onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
-                // Adicionar lógica de logout aqui
+                // Fechar o Drawer
+                Navigator.pop(context);
               },
             ),
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Bem-vindo!",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
+      body: StreamBuilder(
+        stream: _firestore
+            .collection('travels')
+            .where('userId', isEqualTo: _auth.currentUser?.uid)
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text(
+                "Nenhuma viagem registrada.",
+                style: TextStyle(fontSize: 16),
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "Planos recentes:",
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView(
-                children: planos.map((plano) {
-                  return CartaoPlanoDeViagem(
-                    titulo: plano.titulo,
-                    data: plano.data,
-                    descricao: plano.descricao,
-                    veiculo: plano.veiculo,
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
+            );
+          }
+          return ListView(
+            children: snapshot.data!.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return CartaoPlanoDeViagem(
+                titulo: data['titulo'] ?? '',
+                data: data['data'] ?? '',
+                descricao: data['descricao'] ?? '',
+                veiculo: data['veiculo'] ?? '',
+              );
+            }).toList(),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 226, 27, 27),
+        backgroundColor: corDestaque(),
         child: Icon(Icons.add, color: Colors.white),
         onPressed: abrirFormularioCadastro,
       ),
@@ -235,24 +190,10 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
   }
 }
 
-class PlanoDeViagem {
-  final String titulo;
-  final String data;
-  final String descricao;
-  final String veiculo;
-
-  PlanoDeViagem({
-    required this.titulo,
-    required this.data,
-    required this.descricao,
-    required this.veiculo,
-  });
-}
-
 class FormularioPlano extends StatefulWidget {
-  final Function(String, String, String, String) adicionarPlano;
+  final String? usuarioId;
 
-  FormularioPlano({required this.adicionarPlano});
+  FormularioPlano({required this.usuarioId});
 
   @override
   _FormularioPlanoState createState() => _FormularioPlanoState();
@@ -264,7 +205,9 @@ class _FormularioPlanoState extends State<FormularioPlano> {
   final TextEditingController descricaoController = TextEditingController();
   final TextEditingController veiculoController = TextEditingController();
 
-  void enviarPlano() {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  void enviarPlano() async {
     final titulo = tituloController.text;
     final data = dataController.text;
     final descricao = descricaoController.text;
@@ -273,9 +216,20 @@ class _FormularioPlanoState extends State<FormularioPlano> {
     if (titulo.isNotEmpty &&
         data.isNotEmpty &&
         descricao.isNotEmpty &&
-        veiculo.isNotEmpty) {
-      widget.adicionarPlano(titulo, data, descricao, veiculo);
-      Navigator.of(context).pop();
+        veiculo.isNotEmpty &&
+        widget.usuarioId != null) {
+      try {
+        await _firestore.collection('travels').add({
+          'titulo': titulo,
+          'data': data,
+          'descricao': descricao,
+          'veiculo': veiculo,
+          'userId': widget.usuarioId,
+        });
+        Navigator.of(context).pop();
+      } catch (e) {
+        print('Erro ao salvar viagem: $e');
+      }
     }
   }
 
@@ -307,15 +261,23 @@ class _FormularioPlanoState extends State<FormularioPlano> {
           ElevatedButton(
             onPressed: enviarPlano,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 39, 52, 63),
+              backgroundColor: corPrimaria(),
             ),
-            child: Text("Adicionar Plano"),
+            child: Text(
+              "Adicionar Plano",
+              style: TextStyle(color: corBranca()),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text("Cancelar"),
+            child: Text(
+              "Cancelar",
+              style: TextStyle(
+                color: corDestaque(),
+              ),
+            ),
           ),
         ],
       ),
@@ -339,10 +301,12 @@ class CartaoPlanoDeViagem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      color: const Color.fromARGB(255, 39, 52, 63),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: corPrimaria(),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -351,33 +315,53 @@ class CartaoPlanoDeViagem extends StatelessWidget {
             Text(
               titulo,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 215, 34, 34),
+                color: corTitulo(),
+              ),
+            ),
+            Divider(
+              color: corDestaque(),
+              thickness: 1,
+              height: 20,
+            ),
+            Text(
+              "Data: $data",
+              style: TextStyle(
+                fontSize: 14,
+                color: corCinzaClaro(),
               ),
             ),
             SizedBox(height: 8),
             Text(
-              data,
+              "Descrição:",
               style: TextStyle(
-                fontSize: 14,
-                color: const Color.fromARGB(255, 39, 52, 63),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: corBranca(),
               ),
             ),
-            SizedBox(height: 10),
             Text(
               descricao,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[300],
+                color: corBranca(),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 8),
             Text(
-              "Veículo: $veiculo",
+              "Veículo:",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: corBranca(),
+              ),
+            ),
+            Text(
+              veiculo,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[300],
+                color: corBranca(),
               ),
             ),
           ],

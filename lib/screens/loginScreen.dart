@@ -69,7 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text);
+          email: _emailController.text, 
+          password: _passwordController.text
+        );
 
         Users users = await _getUsers(_emailController.text);
 
@@ -108,8 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      backgroundColor: corFundo(),
+      backgroundColor: corPrimaria(),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
