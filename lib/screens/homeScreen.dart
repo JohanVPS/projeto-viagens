@@ -21,12 +21,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 39, 52, 63),
+        primaryColor: corPrimaria(),
         scaffoldBackgroundColor: Colors.grey[200],
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color.fromARGB(255, 39, 52, 63),
+          backgroundColor: corPrimaria(),
           titleTextStyle: TextStyle(
-            color: Colors.white,
+            color: corBranca(),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -36,9 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.black,
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black,
+          backgroundColor: corPreta(),
           titleTextStyle: TextStyle(
-            color: Colors.white,
+            color: corBranca(),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -93,7 +93,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
           IconButton(
             icon: Icon(
               Icons.logout_rounded,
-              color: Colors.white,
+              color: corBranca(),
             ),
             onPressed: () => logout(context),
           ),
@@ -101,7 +101,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
         title: Text(
           "Minhas Viagens",
           style: TextStyle(
-            color: Colors.white,
+            color: corBranca(),
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -119,7 +119,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
               child: Text(
                 'Menu',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: corBranca(),
                   fontSize: 24,
                 ),
               ),
@@ -183,7 +183,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: corDestaque(),
-        child: Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: corBranca()),
         onPressed: abrirFormularioCadastro,
       ),
     );
@@ -201,15 +201,17 @@ class FormularioPlano extends StatefulWidget {
 
 class _FormularioPlanoState extends State<FormularioPlano> {
   final TextEditingController tituloController = TextEditingController();
-  final TextEditingController dataController = TextEditingController();
   final TextEditingController descricaoController = TextEditingController();
   final TextEditingController veiculoController = TextEditingController();
+
+  DateTime? dataSelecionada;
+  bool camposPreenchidos = false;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void enviarPlano() async {
     final titulo = tituloController.text;
-    final data = dataController.text;
+    final data = dataSelecionada != null ? dataSelecionada.toString().split(' ')[0] : '';
     final descricao = descricaoController.text;
     final veiculo = veiculoController.text;
 
@@ -233,53 +235,172 @@ class _FormularioPlanoState extends State<FormularioPlano> {
     }
   }
 
+  void verificarCamposPreenchidos() {
+    setState(() {
+      camposPreenchidos = tituloController.text.isNotEmpty &&
+          descricaoController.text.isNotEmpty &&
+          veiculoController.text.isNotEmpty &&
+          dataSelecionada != null;
+    });
+  }
+
+  Future<void> selecionarData() async {
+    DateTime? novaData = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (novaData != null) {
+      setState(() {
+        dataSelecionada = novaData;
+        verificarCamposPreenchidos();
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    tituloController.addListener(verificarCamposPreenchidos);
+    descricaoController.addListener(verificarCamposPreenchidos);
+    veiculoController.addListener(verificarCamposPreenchidos);
+  }
+
+  @override
+  void dispose() {
+    tituloController.dispose();
+    descricaoController.dispose();
+    veiculoController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: tituloController,
-            decoration: InputDecoration(labelText: "Destino"),
-          ),
-          TextField(
-            controller: dataController,
-            decoration: InputDecoration(labelText: "Data"),
-            keyboardType: TextInputType.datetime,
-          ),
-          TextField(
-            controller: descricaoController,
-            decoration: InputDecoration(labelText: "Descrição"),
-          ),
-          TextField(
-            controller: veiculoController,
-            decoration: InputDecoration(labelText: "Meio de transporte"),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: enviarPlano,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: corPrimaria(),
-            ),
-            child: Text(
-              "Adicionar Plano",
-              style: TextStyle(color: corBranca()),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              "Cancelar",
-              style: TextStyle(
-                color: corDestaque(),
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            offset: Offset(0, -5),
           ),
         ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Novo Plano de Viagem",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: corPrimaria(),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: tituloController,
+              decoration: InputDecoration(
+                labelText: "Destino",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: descricaoController,
+              decoration: InputDecoration(
+                labelText: "Descrição",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              controller: veiculoController,
+              decoration: InputDecoration(
+                labelText: "Meio de transporte",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.calendar_today, color: corPrimaria()),
+                  onPressed: selecionarData,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  dataSelecionada != null
+                      ? dataSelecionada!.toLocal().toString().split(' ')[0]
+                      : "Selecione uma data",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: camposPreenchidos ? enviarPlano : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: camposPreenchidos
+                          ? corPrimaria()
+                          : Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Adicionar",
+                      style: TextStyle(color: corBranca()),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: corDestaque()),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Cancelar",
+                      style: TextStyle(color: corDestaque()),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

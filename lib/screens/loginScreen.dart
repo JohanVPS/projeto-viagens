@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:viagens/classes/users.dart';
 import 'package:viagens/screens/SignupScreen.dart';
 import 'package:viagens/screens/homeScreen.dart';
+import 'package:viagens/screens/trocaSenha.dart';
 import '../widgets/cores.dart';
 import '../widgets/inputDec.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -67,42 +68,53 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = true;
       });
+
+      final currentContext = context; // Captura o contexto atual
+
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text, 
-          password: _passwordController.text
+          email: _emailController.text,
+          password: _passwordController.text,
         );
 
         Users users = await _getUsers(_emailController.text);
 
         print(users);
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(),
-          ),
-        );
+        // Usando o contexto capturado
+        if (mounted) {
+          Navigator.pushReplacement(
+            currentContext,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ),
+          );
+        }
       } on FirebaseAuthException catch (e) {
         print(e);
-        showDialog(
-            context: context,
+        if (mounted) {
+          showDialog(
+            context: currentContext,
             builder: (context) => AlertDialog(
-                  title: const Text('Falha no login'),
-                  content: const Text('Email ou senha incorretos'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ));
+              title: const Text('Falha no login'),
+              content: const Text('Email ou senha incorretos'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(currentContext).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -195,7 +207,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     )),
-                SizedBox(height: 20),
+                SizedBox(height: 15),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TrocaSenha()),
+                      );
+                    },
+                    child: Text(
+                      'Esqueceu sua senha?',
+                      style: TextStyle(
+                        color: corBranca(),
+                        fontSize: 18,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
 
                 // Botão de login
                 SizedBox(
