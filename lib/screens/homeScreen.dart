@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:viagens/screens/loginScreen.dart';
+import 'package:viagens/screens/settingsScreen.dart';
 import 'package:viagens/widgets/cores.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   runApp(HomeScreen());
@@ -144,8 +146,12 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
               leading: Icon(Icons.settings),
               title: Text('Configurações'),
               onTap: () {
-                // Fechar o Drawer
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Settings(),
+                  ),
+                );
               },
             ),
           ],
