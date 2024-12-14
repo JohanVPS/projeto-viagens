@@ -7,17 +7,39 @@ import 'package:viagens/screens/loginScreen.dart';
 import 'package:viagens/screens/settingsScreen.dart' as customSettings;
 import 'package:viagens/widgets/cores.dart';
 
-void main() {
-  runApp(HomeScreen());
-}
-
 class HomeScreen extends StatefulWidget {
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
+
+  const HomeScreen({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  });
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
-  bool isDarkMode = false;
+  late bool isDarkMode;
+  late ValueChanged<bool> onThemeChanged;
+
+  @override
+    void initState() {
+    super.initState();
+    isDarkMode = widget.isDarkMode;
+    onThemeChanged =widget.onThemeChanged;
+  }
+
+  void toggleTheme(bool value) {
+    setState(() {
+      isDarkMode = value;
+      widget.onThemeChanged(isDarkMode);
+    });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +70,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: TelaPlanosDeViagem(),
+      home: TelaPlanosDeViagem(
+        onThemeChanged: toggleTheme,
+        isDarkMode: isDarkMode,
+      ),
     );
   }
 }
 
 class TelaPlanosDeViagem extends StatefulWidget {
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
+
+  TelaPlanosDeViagem({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  });
+
   @override
   _TelaPlanosDeViagemState createState() => _TelaPlanosDeViagemState();
 }
@@ -67,7 +101,8 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
       await _auth.signOut();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen(isDarkMode: widget.isDarkMode,
+              onThemeChanged: widget.onThemeChanged,)),
       );
     } catch (e) {
       print('Erro ao fazer logout: $e');
@@ -131,7 +166,6 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
               leading: Icon(Icons.home),
               title: Text('Página Inicial'),
               onTap: () {
-                
                 Navigator.pop(context);
               },
             ),
@@ -154,11 +188,15 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => customSettings.Settings(),
+                    builder: (context) => customSettings.Settings(
+                      isDarkMode: widget.isDarkMode, // Passa o estado atual do tema
+                      onThemeChanged: widget.onThemeChanged
+                    ),
                   ),
                 );
               },
             ),
+
           ],
         ),
       ),
@@ -520,5 +558,4 @@ class CartaoPlanoDeViagem extends StatelessWidget {
       ),
     );
   }
-
 }

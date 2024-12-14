@@ -9,6 +9,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
+  
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
+
+  const LoginScreen({
+    Key? key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  }) : super(key: key);
+  
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -86,7 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacement(
             currentContext,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(),
+              builder: (context) => HomeScreen(isDarkMode: widget.isDarkMode,
+              onThemeChanged: widget.onThemeChanged,),
             ),
           );
         }

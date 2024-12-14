@@ -4,45 +4,23 @@ import 'package:viagens/widgets/cores.dart';
 // AUTOR DA TELA --------> RAFAEL GARCIA
 
 class Settings extends StatefulWidget {
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
+
+  const Settings({
+    Key? key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  }) : super(key: key);
+
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
-  bool isDarkMode = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return SettingsScreen(
-        isDarkMode: isDarkMode,
-        onThemeChanged: (bool value) {
-          setState(() {
-            isDarkMode = value;
-          });
-        },
-      );
-  }
-}
-
-class SettingsScreen extends StatefulWidget {
-  final bool isDarkMode;
-  final ValueChanged<bool> onThemeChanged;
-
-  const SettingsScreen({
-    required this.isDarkMode,
-    required this.onThemeChanged,
-  });
-
-  @override
-  _SettingsScreenState createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
   bool notificationsEnabled = true;
-
   String savedEmail = "emaildousuario@gmail.com";
   String savedPassword = "senha_do_usuario";
-
   bool showEmail = false;
   bool showPassword = false;
 
@@ -50,56 +28,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Configurações'),
+        title: const Text('Configurações'),
         centerTitle: true,
-        iconTheme: IconThemeData(color: corBranca()),        
+        iconTheme: IconThemeData(color: corBranca()),
       ),
       body: ListView(
         children: [
-
-          // // Privacidade
-
-          // SettingsSection(
-          //   title: 'Privacidade',
-          //   children: [
-          //     ListTile(
-          //       leading: Icon(Icons.email),
-          //       title: Text('Email'),
-          //       subtitle: Text(showEmail ? savedEmail : '********'),
-          //       trailing: IconButton(
-          //         icon: Icon(showEmail ? Icons.visibility : Icons.visibility_off),
-          //         onPressed: () {
-          //           setState(() {
-          //             showEmail = !showEmail;
-          //           });
-          //         },
-          //       ),
-          //     ),
-          //     ListTile(
-          //       leading: Icon(Icons.lock),
-          //       title: Text('Senha'),
-          //       subtitle: Text(showPassword ? savedPassword : '********'),
-          //       trailing: IconButton(
-          //         icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off),
-          //         onPressed: () {
-          //           setState(() {
-          //             showPassword = !showPassword;
-          //           });
-          //         },
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // Divider(),
-
-          // Notificações
-
+          // Seção de notificações
           SettingsSection(
             title: 'Notificações',
             children: [
               ListTile(
-                leading: Icon(Icons.notifications),
-                title: Text('Ativar Notificações'),
+                leading: const Icon(Icons.notifications),
+                title: const Text('Ativar Notificações'),
                 trailing: Switch(
                   value: notificationsEnabled,
                   onChanged: (bool value) {
@@ -111,88 +52,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
-          Divider(),
+          const Divider(),
 
-          // Temas
-
+          // Seção de temas
           SettingsSection(
             title: 'Tema',
             children: [
               ListTile(
-                leading: Icon(Icons.brightness_6),
-                title: Text('Modo Escuro'),
+                leading: const Icon(Icons.brightness_6),
+                title: const Text('Modo Escuro'),
                 trailing: Switch(
                   value: widget.isDarkMode,
-                  onChanged: widget.onThemeChanged,
+                  onChanged: (bool value) {
+                    widget.onThemeChanged(value);
+                  },
                 ),
               ),
             ],
           ),
-          Divider(),
+          const Divider(),
 
-          // Sobre
-
+          // Seção sobre
           SettingsSection(
             title: 'Outros',
             children: [
               ListTile(
-                leading: Icon(Icons.info),
-                title: Text('Sobre'),
+                leading: const Icon(Icons.info),
+                title: const Text('Sobre'),
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Sobre o App'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('TriOcupado'),
-                            SizedBox(height: 10),
-                            Text('Versão: 1.0.0'),
-                            SizedBox(height: 10),
-                            Text('© 2024 Globetrotter'),
-                            SizedBox(height: 10),
-                            Text(
-                              'Este aplicativo foi desenvolvido para ajudar você a gerenciar, planejar e organizar as suas viagens.',
-                            ),
-                          ],
-                        ),
-                        actions: <Widget>[
-                          IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
+                  _showDialog(
+                    context,
+                    'Sobre o App',
+                    'TriOcupado\n\nVersão: 1.0.0\n\n© 2024 Globetrotter\n\nEste aplicativo foi desenvolvido para ajudar você a gerenciar, planejar e organizar as suas viagens.',
                   );
                 },
               ),
               ListTile(
-                leading: Icon(Icons.article),
-                title: Text('Termos de Uso'),
+                leading: const Icon(Icons.article),
+                title: const Text('Termos de Uso'),
                 onTap: () {
-                  _showDialog(context, 'Termos de Uso',
-                      'Estes Termos de Uso regulam o uso do aplicativo (TriOcupado), fornecido pela nossa empresa (Globetrotter), para fins de planejamento e organização de viagens. Ao acessar ou usar o Aplicativo, você concorda em cumprir e estar vinculado a estes Termos. Se você não concorda com esses Termos, não utilize o Aplicativo.\n\n1. Uso do Aplicativo\n2. Conta de Usuário\n3. Privacidade e Coleta de Dados\n4. Conteúdo e Propriedade Intelectual\n5. Reservas e Transações\n6. Limitação de Responsabilidade\n7. Modificações no Aplicativo\n8. Rescisão\n9. Legislação Aplicável\n');
+                  _showDialog(
+                    context,
+                    'Termos de Uso',
+                    'Estes Termos de Uso regulam o uso do aplicativo (TriOcupado), fornecido pela nossa empresa (Globetrotter), para fins de planejamento e organização de viagens.\n\n1. Uso do Aplicativo\n2. Conta de Usuário\n3. Privacidade e Coleta de Dados\n4. Conteúdo e Propriedade Intelectual\n5. Reservas e Transações\n6. Limitação de Responsabilidade\n7. Modificações no Aplicativo\n8. Rescisão\n9. Legislação Aplicável\n',
+                  );
                 },
               ),
               ListTile(
-                leading: Icon(Icons.privacy_tip),
-                title: Text('Política de Privacidade'),
+                leading: const Icon(Icons.privacy_tip),
+                title: const Text('Política de Privacidade'),
                 onTap: () {
-                  _showDialog(context, 'Política de Privacidade',
-                      'Esta Política de Privacidade explica como o (TriOcupado) coleta, utiliza, armazena e compartilha suas informações pessoais quando você usa nosso aplicativo de planejamento de viagens. Ao usar nosso aplicativo, você concorda com a coleta e o uso de suas informações de acordo com esta política.\n\n'
-                      'Informações que Coletamos: \n\n'
-                      'Quando você utiliza o TriOcupado, coletamos diferentes tipos de informações:\n\n'
-                      '• Informações Pessoais: Como nome, e-mail, número de telefone.\n\n'
-                      '• Informações de Viagem: Detalhes sobre suas viagens planejadas, como destinos, datas, acomodações, atividades, meios de transporte e preferências de viagem.\n\n'
-                      '• Informações de Localização: Se você permitir, podemos coletar sua localização para sugerir destinos ou serviços próximos, como hotéis ou atrações turísticas.\n\n'
-                      '• Informações de Uso: Coletamos dados sobre como você interage com o aplicativo, como os recursos que você usa, tempo gasto no aplicativo e páginas acessadas.\n\n'
-                      '• Informações de Dispositivo: Dados sobre seu dispositivo, como modelo, sistema operacional, identificadores únicos e endereço IP.\n\n');
+                  _showDialog(
+                    context,
+                    'Política de Privacidade',
+                    'Esta Política de Privacidade explica como o (TriOcupado) coleta, utiliza, armazena e compartilha suas informações pessoais quando você usa nosso aplicativo de planejamento de viagens.\n\nInformações que Coletamos:\n\n• Informações Pessoais: Como nome, e-mail, número de telefone.\n\n• Informações de Viagem: Detalhes sobre suas viagens planejadas, como destinos, datas, acomodações, atividades, meios de transporte e preferências de viagem.\n\n• Informações de Localização: Se você permitir, podemos coletar sua localização para sugerir destinos ou serviços próximos, como hotéis ou atrações turísticas.\n\n• Informações de Uso: Coletamos dados sobre como você interage com o aplicativo, como os recursos que você usa, tempo gasto no aplicativo e páginas acessadas.\n\n• Informações de Dispositivo: Dados sobre seu dispositivo, como modelo, sistema operacional, identificadores únicos e endereço IP.',
+                  );
                 },
               ),
             ],
@@ -213,7 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.close),
+              icon: const Icon(Icons.close),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -240,12 +154,12 @@ class SettingsSection extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8.0),
+          const SizedBox(height: 8.0),
           ...children,
         ],
       ),

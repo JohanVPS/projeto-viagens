@@ -4,17 +4,21 @@ import 'package:viagens/screens/homeScreen.dart';
 import 'package:viagens/screens/loginScreen.dart';
 
 class Verificaloginscreen extends StatelessWidget {
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
 
-  const Verificaloginscreen({super.key});
+  const Verificaloginscreen({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      // vê se o usuário está autenticado
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          // vê se a conta está ativa
           return FutureBuilder<void>(
             future: _checkUserAccess(context),
             builder: (context, futureSnapshot) {
@@ -22,20 +26,23 @@ class Verificaloginscreen extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (futureSnapshot.hasError) {
-                // Se tiver um erro, redireciona para a página de login
                 return const Center(child: Text('Sua conta foi desativada.'));
               }
-              return HomeScreen();
+              return HomeScreen(
+                isDarkMode: isDarkMode,
+                onThemeChanged: onThemeChanged,
+              );
             },
           );
         } else if (snapshot.hasError) {
-          // Se houver erro, exibe a mensagem de erro
           return Text('Error: ${snapshot.error}');
         }
-        // Mostra indicador de carregamento ou LoginPage
         return snapshot.connectionState == ConnectionState.waiting
             ? const Center(child: CircularProgressIndicator())
-            : LoginScreen();
+            : LoginScreen(
+              isDarkMode: isDarkMode,
+              onThemeChanged: onThemeChanged,
+            );
       },
     );
   }
@@ -56,7 +63,8 @@ class Verificaloginscreen extends StatelessWidget {
       // Em caso de erro (como conta desativada), realiza o logout e redireciona para a LoginPage
       await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen(isDarkMode: isDarkMode,
+              onThemeChanged: onThemeChanged,)),
       );
     }
   }
