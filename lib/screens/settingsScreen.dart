@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:viagens/widgets/cores.dart';
 
 // AUTOR DA TELA --------> RAFAEL GARCIA
 
@@ -12,18 +13,14 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: SettingsScreen(
+    return SettingsScreen(
         isDarkMode: isDarkMode,
         onThemeChanged: (bool value) {
           setState(() {
             isDarkMode = value;
           });
         },
-      ),
-    );
+      );
   }
 }
 
@@ -54,6 +51,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Configurações'),
+        centerTitle: true,
+        iconTheme: IconThemeData(color: corBranca()),        
       ),
       body: ListView(
         children: [

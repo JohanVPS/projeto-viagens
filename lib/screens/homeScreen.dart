@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:viagens/screens/contaScreen.dart';
+import 'package:viagens/screens/detalhesScreen.dart';
 import 'package:viagens/screens/loginScreen.dart';
-import 'package:viagens/screens/settingsScreen.dart';
+import 'package:viagens/screens/settingsScreen.dart' as customSettings;
 import 'package:viagens/widgets/cores.dart';
-import 'package:flutter/material.dart';
 
 void main() {
   runApp(HomeScreen());
@@ -130,7 +131,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
               leading: Icon(Icons.home),
               title: Text('Página Inicial'),
               onTap: () {
-                // Fechar o Drawer
+                
                 Navigator.pop(context);
               },
             ),
@@ -138,8 +139,12 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
               leading: Icon(Icons.account_circle_rounded),
               title: Text('Conta'),
               onTap: () {
-                // Fechar o Drawer
-                Navigator.pop(context);
+               Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ContaScreen(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -149,7 +154,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Settings(),
+                    builder: (context) => customSettings.Settings(),
                   ),
                 );
               },
@@ -177,7 +182,10 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
           return ListView(
             children: snapshot.data!.docs.map((doc) {
               final data = doc.data() as Map<String, dynamic>;
+              final id = doc.id; // Pegue o ID do documento aqui
+
               return CartaoPlanoDeViagem(
+                id: id, // Passe o ID aqui
                 titulo: data['titulo'] ?? '',
                 data: data['data'] ?? '',
                 descricao: data['descricao'] ?? '',
@@ -185,6 +193,7 @@ class _TelaPlanosDeViagemState extends State<TelaPlanosDeViagem> {
               );
             }).toList(),
           );
+
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -417,8 +426,10 @@ class CartaoPlanoDeViagem extends StatelessWidget {
   final String data;
   final String descricao;
   final String veiculo;
+  final String id;
 
   CartaoPlanoDeViagem({
+    required this.id,
     required this.titulo,
     required this.data,
     required this.descricao,
@@ -427,73 +438,87 @@ class CartaoPlanoDeViagem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      color: corPrimaria(),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              titulo,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: corTitulo(),
+    return GestureDetector(
+      onTap: () {
+        // Navegação para a tela de detalhes
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetalhesScreen(
+              tripId: id,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        color: corPrimaria(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                titulo,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: corTitulo(),
+                ),
               ),
-            ),
-            Divider(
-              color: corDestaque(),
-              thickness: 1,
-              height: 20,
-            ),
-            Text(
-              "Data: $data",
-              style: TextStyle(
-                fontSize: 14,
-                color: corCinzaClaro(),
+              Divider(
+                color: corDestaque(),
+                thickness: 1,
+                height: 20,
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Descrição:",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: corBranca(),
+              Text(
+                "Data: $data",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: corCinzaClaro(),
+                ),
               ),
-            ),
-            Text(
-              descricao,
-              style: TextStyle(
-                fontSize: 14,
-                color: corBranca(),
+              SizedBox(height: 8),
+              Text(
+                "Descrição:",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: corBranca(),
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Veículo:",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: corBranca(),
+              Text(
+                descricao,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: corBranca(),
+                ),
               ),
-            ),
-            Text(
-              veiculo,
-              style: TextStyle(
-                fontSize: 14,
-                color: corBranca(),
+              SizedBox(height: 8),
+              Text(
+                "Veículo:",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: corBranca(),
+                ),
               ),
-            ),
-          ],
+              Text(
+                veiculo,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: corBranca(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 }
