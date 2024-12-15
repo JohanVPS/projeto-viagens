@@ -4,7 +4,7 @@ Projeto desenvolvido para a avaliação final da matéria de Programação de Ap
 
 ## Objetivo
 
-Desenvolver uma Aplicação, de Planejamento de Viagens, utilizando os conhecimentos adquiridos em Flutter.
+Desenvolver uma Aplicação de Planejamento de Viagens, utilizando os conhecimentos adquiridos em Flutter.
 
 ## Requisitos
 
@@ -14,11 +14,11 @@ Desenvolver uma Aplicação, de Planejamento de Viagens, utilizando os conhecime
 
 ### Funcionalidades CRUD:
 
-- Implementem um sistema CRUD (Create, Read, Update, Delete) que permita adicionar, editar e excluir registros.
+- Implementar um sistema CRUD (Create, Read, Update, Delete) que permita adicionar, editar e excluir registros.
 
 ### Visualização de Dados:
 
-- Incluam uma tela que mostre uma lista dos registros adicionados.
+- Incluir uma tela que mostre uma lista dos registros adicionados.
 
 ### Navegação:
 
@@ -26,11 +26,12 @@ Desenvolver uma Aplicação, de Planejamento de Viagens, utilizando os conhecime
 
 ### Persistência de Dados:
 
-- Utilizem o Firebase Cloud Firestore para a persistência de dados, garantindo que as informações sejam salvas e recuperadas corretamente.
+- Utilizar o Firebase Cloud Firestore para a persistência de dados, garantindo que as informações sejam salvas e recuperadas corretamente.
 
 ### Entregáveis
 
 - Link do repositório do projeto no GitHub
+- Video de até 10 minutos exibindo e explicando o projeto
 
 ## Obtendo o projeto
 
