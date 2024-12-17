@@ -1,49 +1,113 @@
-# Projeto de Planejameno de Viagens
+# Projeto de Planejamento de Viagens
 
-Projeto desenvolvido para a avaliação final da matéria de Programação de Aplicativos do curso de Desenvolvimento de Sistemas.
+Projeto desenvolvido como avaliação final da matéria de **Programação de Aplicativos** do curso de **Desenvolvimento de Sistemas**.
 
 ## Objetivo
 
-Desenvolver uma Aplicação de Planejamento de Viagens, utilizando os conhecimentos adquiridos em Flutter.
+Desenvolver uma aplicação de planejamento de viagens, utilizando os conhecimentos adquiridos em Flutter para oferecer uma solução funcional e intuitiva.
 
-## Requisitos
+---
 
-### Interface do Usuário:
+## Integrantes do Grupo
 
-- A tela inicial deve conter botões de navegação, um menu lateral (drawer) e uma imagem relevante ao tema do aplicativo.
+- **Felipe da Silva**
+- **Johan Santos**
+- **Leandro**
+- **Rafael Garcia**
+- **Ryan**
 
-### Funcionalidades CRUD:
+---
 
-- Implementar um sistema CRUD (Create, Read, Update, Delete) que permita adicionar, editar e excluir registros.
+## Requisitos do Projeto
 
-### Visualização de Dados:
+### Interface do Usuário
 
-- Incluir uma tela que mostre uma lista dos registros adicionados.
+- A tela inicial deve conter:
+  - Botões de navegação;
+  - Um menu lateral (drawer);
+  - Uma imagem temática relacionada a viagens.
 
-### Navegação:
+### Funcionalidades CRUD
 
-- O aplicativo deve ter mais de uma tela para proporcionar uma navegação fluida entre diferentes seções.
+- Implementar um sistema CRUD que permita:
+  - Adicionar novos registros;
+  - Editar registros existentes;
+  - Excluir registros indesejados;
+  - Visualizar os dados registrados.
 
-### Persistência de Dados:
+### Visualização de Dados
 
-- Utilizar o Firebase Cloud Firestore para a persistência de dados, garantindo que as informações sejam salvas e recuperadas corretamente.
+- Disponibilizar uma tela com uma lista que exiba todos os registros adicionados de forma clara e organizada.
 
-### Entregáveis
+### Navegação
 
-- Link do repositório do projeto no GitHub
-- Video de até 10 minutos exibindo e explicando o projeto
+- O aplicativo deve conter múltiplas telas para oferecer uma navegação fluida e intuitiva entre as diferentes funcionalidades.
 
-## Obtendo o projeto
+### Persistência de Dados
 
-Ao clonar o repositório, ou fazer o download do arquivo zip para testar, executar os seguintes passos:
+- Utilizar o **Firebase Cloud Firestore** para persistência de dados, garantindo que as informações sejam salvas e recuperadas corretamente, mesmo após o fechamento do aplicativo.
 
-- Verifique se o Flutter já está instalado na sua máquina. Caso não esteja, siga os passos de instalação presentes no [site oficial do flutter](https://docs.flutter.dev/get-started/install);
-- Caso queira executar em um emulador android, instale e configure o [Android Studio](https://developer.android.com/studio?hl=pt-br&authuser=2);
-- Instale a extensão para Flutter no [Visual Studio Code](https://code.visualstudio.com), caso queira utiliza-lo como IDE;
-- Ao entrar na pasta do projeto, execute o comando `fluter pub get` no terminal, para que sejam instaladas as dependências necessárias;
+---
 
-**Caso queira ver o projeto sem obter o código, ele está disponível no [site](https://projeto-viagens-e94b6.web.app).**
+## Entregáveis
 
-## Consideração final
+1. **Repositório do Projeto**
+   - O código-fonte completo estará disponível no GitHub.
 
-A execução de um projeto em flutter pode ser pesada para algumas máquinas, principalmente com o uso de emulador. Leve isso em conta.
+2. **Demonstração em Vídeo**
+   - Um vídeo de até 10 minutos apresentando as funcionalidades implementadas, com explicações detalhadas do funcionamento do aplicativo.
+
+---
+
+## Como Obter o Projeto
+
+Para testar o aplicativo, siga as instruções abaixo:
+
+### Pré-requisitos
+
+1. Certifique-se de que o Flutter está instalado na sua máquina:
+   - Caso contrário, siga os passos de instalação no [site oficial do Flutter](https://docs.flutter.dev/get-started/install).
+
+2. Caso deseje executar o projeto em um emulador Android:
+   - Instale e configure o [Android Studio](https://developer.android.com/studio?hl=pt-br&authuser=2).
+
+3. Se optar por usar o Visual Studio Code como IDE:
+   - Instale a extensão para Flutter disponível no [site oficial do VS Code](https://code.visualstudio.com).
+
+### Passos para Execução
+
+1. Clone o repositório ou faça o download do arquivo .zip.
+
+2. Abra o terminal na pasta raiz do projeto e execute o comando:
+   ```bash
+   flutter pub get
+   ```
+   - Isso instalará todas as dependências necessárias.
+
+3. Conecte um dispositivo físico ou inicie um emulador Android.
+
+4. Execute o comando:
+   ```bash
+   flutter run
+   ```
+   - O aplicativo será iniciado no dispositivo ou emulador conectado.
+
+---
+
+## Visualização Online
+
+Se preferir, você pode acessar o projeto diretamente no navegador, sem necessidade de obter o código-fonte, através do link:
+
+[**Projeto de Planejamento de Viagens**](https://projeto-viagens-e94b6.web.app)
+
+---
+
+## Observações Finais
+
+- O Flutter é uma ferramenta poderosa, mas pode demandar um desempenho elevado do computador, especialmente ao utilizar emuladores.
+  - Recomendamos usar dispositivos físicos para uma experiência mais fluida.
+
+---
+
+**Desenvolvido por:**
+Felipe da Silva, Johan Santos, Leandro, Rafael Garcia, e Ryan.  
